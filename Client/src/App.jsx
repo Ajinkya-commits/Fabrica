@@ -11,13 +11,18 @@ import Orders from "./pages/Orders";
 import MainNavbar from "./components/MainNavbar";
 import { AuroraBackground } from "./components/ui/aurora-background";
 import Footer from "./components/Footer";
+import SearchBar from "./components/SearchBar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   return (
     <AuroraBackground>
       <div className="relative w-full min-h-screen h-full">
         <div className="relative z-10 px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] pt-40">
+          <ToastContainer />
           <MainNavbar />
+          <SearchBar></SearchBar>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/collection" element={<Collection />} />

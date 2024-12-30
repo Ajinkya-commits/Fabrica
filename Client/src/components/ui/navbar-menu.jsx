@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const transition = {
   type: "spring",
@@ -57,7 +58,7 @@ export const Menu = ({ setActive, children }) => {
 
 export const ProductItem = ({ title, description, href, src }) => {
   return (
-    <a href="#" className="flex space-x-2">
+    <Link to={href} className="flex space-x-2">
       <img
         src={src}
         width={140}
@@ -73,7 +74,7 @@ export const ProductItem = ({ title, description, href, src }) => {
           {description}
         </p>
       </div>
-    </a>
+    </Link>
   );
 };
 
