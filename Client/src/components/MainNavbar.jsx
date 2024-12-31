@@ -17,7 +17,22 @@ export default function MainNavbar() {
 function Navbar({ className }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
-  const { setShowSearch, getCartCount } = useContext(ShopContext);
+  const {
+    setShowSearch,
+    getCartCount,
+    navigate,
+    token,
+    setToken,
+    setCardItems,
+  } = useContext(ShopContext);
+
+  const logout = () => {
+    navigate("/login");
+    localStorage.removeItem("token");
+    console.log("clicked");
+    setToken("");
+    setCardItems({});
+  };
   return (
     <div
       className={cn("fixed top-10 w-full lg:max-w-4xl mx-auto z-50", className)}
@@ -87,24 +102,31 @@ function Navbar({ className }) {
           </svg>
 
           <div className="group relative">
-            <Link to={'/login'}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="30px"
-                viewBox="0 -960 960 960"
-                width="30px"
-                fill="#FFFFFF"
-              >
-                <path d="M480-492.31q-57.92 0-98.96-41.04Q340-574.38 340-632.31q0-57.92 41.04-98.96 41.04-41.04 98.96-41.04 57.92 0 98.96 41.04Q620-690.23 620-632.31q0 57.93-41.04 98.96-41.04 41.04-98.96 41.04ZM180-248.46v-28.16q0-29.38 15.96-54.42 15.96-25.04 42.66-38.5 59.3-29.07 119.65-43.61 60.35-14.54 121.73-14.54t121.73 14.54q60.35 14.54 119.65 43.61 26.7 13.46 42.66 38.5Q780-306 780-276.62v28.16q0 25.3-17.73 43.04-17.73 17.73-43.04 17.73H240.77q-25.31 0-43.04-17.73Q180-223.16 180-248.46Z" />
-              </svg>
-            </Link>
-            <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
-              <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-gray-500 text-slate-100 rounded-md">
-                <p className=" cursor-pointer hover:text-black">My Profile</p>
-                <p className=" cursor-pointer hover:text-black">Orders</p>
-                <p className=" cursor-pointer hover:text-black">Logout</p>
+            <svg
+              onClick={() => (token ? null : navigate("/login"))}
+              xmlns="http://www.w3.org/2000/svg"
+              height="30px"
+              viewBox="0 -960 960 960"
+              width="30px"
+              fill="#FFFFFF"
+            >
+              <path d="M480-492.31q-57.92 0-98.96-41.04Q340-574.38 340-632.31q0-57.92 41.04-98.96 41.04-41.04 98.96-41.04 57.92 0 98.96 41.04Q620-690.23 620-632.31q0 57.93-41.04 98.96-41.04 41.04-98.96 41.04ZM180-248.46v-28.16q0-29.38 15.96-54.42 15.96-25.04 42.66-38.5 59.3-29.07 119.65-43.61 60.35-14.54 121.73-14.54t121.73 14.54q60.35 14.54 119.65 43.61 26.7 13.46 42.66 38.5Q780-306 780-276.62v28.16q0 25.3-17.73 43.04-17.73 17.73-43.04 17.73H240.77q-25.31 0-43.04-17.73Q180-223.16 180-248.46Z" />
+            </svg>
+
+            {token && (
+              <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
+                <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-gray-500 text-slate-100 rounded-md">
+                  <p className=" cursor-pointer hover:text-black">My Profile</p>
+                  <p onClick={() => navigate('/orders')} className=" cursor-pointer hover:text-black">Orders</p>
+                  <p
+                    onClick={logout}
+                    className=" cursor-pointer hover:text-black"
+                  >
+                    Logout
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
           <Link to={"/cart"} className="relative">
             <svg

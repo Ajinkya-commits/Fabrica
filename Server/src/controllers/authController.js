@@ -1,6 +1,6 @@
 import admin from "../config/firebaseConfig.js"; // Firebase admin config
 import userModel from "../models/userModel.js"; // Mongoose model for users
-import bcrypt from "bcryptjs"; // For password hashing
+import bcrypt from "bcrypt"; // For password hashing
 import jwt from "jsonwebtoken"; // For generating JWT tokens
 
 // Register user
@@ -57,17 +57,26 @@ export const loginUser = async (req, res) => {
   try {
     // First, verify the user through Firebase Authentication
     const firebaseUser = await admin.auth().getUserByEmail(email);
-    // Check if the Firebase user exists and authenticate password
-    const firebaseToken = await admin
-      .auth()
-      .createCustomToken(firebaseUser.uid); // This is the token you can use on the client
 
-    // Find the user in MongoDB to get additional user details (name, cartData, etc.)
+    // Find the user in MongoDB to get additional user details (name, hashed password, etc.)
     const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare the provided password with the hashed password in the database
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // Generate a custom Firebase token for the user
+    const firebaseToken = await admin.auth().createCustomToken(firebaseUser.uid);
 
     // Generate a JWT token for the user (this is used in your app for authentication purposes)
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id},
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -77,11 +86,11 @@ export const loginUser = async (req, res) => {
       message: "Login successful",
       token,
       firebaseToken, // Optional: You can send the Firebase token to the client for Firebase-specific operations
-      user: { name: user.name, email: user.email, role: user.role },
+      user: { name: user.name, email: user.email},
     });
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(500).json({ message: "Invalid Credentials", error });
+    res.status(500).json({ message: "Something went wrong", error });
   }
 };
 // Admin login
