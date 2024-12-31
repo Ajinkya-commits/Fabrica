@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import productRoutes from "./routes/product.route.js";
 import authRoutes from "./routes/auth.route.js";
+import cartRouter from "./routes/cartRoute.js";
 dotenv.config({ path: "./.env" });
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 
 app.use("/api/user", authRoutes);
 app.use("/api/product", productRoutes);
+app.use("/api/cart", cartRouter);
 app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
