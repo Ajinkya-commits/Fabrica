@@ -108,11 +108,12 @@ export const adminLogin = async (req, res) => {
 
     // Send back the token and user info in the response
     res.status(200).json({
+      success: true,
       message: "Admin login successful",
       token
     });
   } catch (error) {
-    console.error("Error during admin login:", error);
+    console.error("Invalid Credentials", error);
     res.status(500).json({ success: "false", message: "Invalid Credentials" });
   }
 };

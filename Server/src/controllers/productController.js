@@ -47,6 +47,7 @@ export const addProduct = async (req, res) => {
     res.json({
       success: true,
       message: "Product added successfully",
+      productData
     
     });
   } catch (error) {
