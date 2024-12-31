@@ -1,8 +1,38 @@
-import { useState } from "react";
+
+import { toast } from "react-toastify";
+import { useState,useContext } from "react";
+import { ShopContext } from "../context/ShopContext";
+import axios from "axios";
+
+
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
+  const {token,setToken,navigate,backendUrl} = useContext(ShopContext);
+
+  const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    try {
+      if(currentState === 'Sign Up'){
+        const response = await axios.post(backendUrl + '/api/user/register',{name,email,password})
+        console.log(response);
+        if(response.data.success){
+          setToken(response.data.token)
+          localStorage.setItem('token',response.data.token)
+        }else{
+          toast.error(response.data.message)
+        }
+      }else{
+        const response = await axios.post(backendUrl + '/api/user/login',{email,password})
+        console.log(response.data);;
+        
+      }
+    } catch (error) {
+      
+    }
   };
   return (
     <form
@@ -17,8 +47,9 @@ const Login = () => {
         ""
       ) : (
         <input
+        onChange={(e)=>setName(e.target.value)} value={name}
           type="text"
-          className="w-full px-3 py-2 border border-gray-100"
+          className="w-full text-black px-3 py-2 border border-gray-100"
           placeholder="Name"
           required
         />
@@ -26,13 +57,15 @@ const Login = () => {
 
       <input
         type="email"
-        className="w-full px-3 py-2 border border-gray-100"
+        onChange={(e)=>setEmail(e.target.value)} value={email}
+        className="w-full text-black px-3 py-2 border border-gray-100"
         placeholder="Email"
         required
       />
       <input
         type="password"
-        className="w-full px-3 py-2 border border-gray-100"
+        onChange={(e)=>setPassword(e.target.value)} value={password}
+        className="w-full text-black px-3 py-2 border border-gray-100"
         placeholder="Password"
         required
       />

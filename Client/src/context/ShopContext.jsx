@@ -1,17 +1,22 @@
 import { createContext, useEffect } from "react";
-import { products } from "../assets/frontend_assets/assets";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'
+
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
   const currency = "₹";
   const delivery_fee = 10;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  console.log(backendUrl);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [products, setProducts] = useState([]);
+  const [token, setToken] = useState('')
   const navigate = useNavigate();
 
   const addToCart = async (itemId, size) => {
@@ -41,11 +46,32 @@ const ShopContextProvider = (props) => {
           if (cartItems[items][item] > 0) {
             totalCount += cartItems[items][item];
           }
-        } catch (error) {}
+        } catch (error) {
+          console.error('error',error)
+        }
       }
     }
     return totalCount;
   };
+
+  const getProductsData = async()=>{
+    try {
+      const response = await axios.get(backendUrl +'/api/product/list')
+      console.log(response.data)
+      if(response.data.success){
+        setProducts(response.data.products)
+      }
+    } catch (error) {
+      console.error("error occurred while fetching product",error)
+      toast.error(error.message);
+      
+    }
+  }
+  
+useEffect(() => {
+  getProductsData()
+}, [])
+
 
   const updateQuantity = async (itemId, size, quantity) => {
     let cartData = structuredClone(cartItems);
@@ -62,7 +88,9 @@ const ShopContextProvider = (props) => {
           if (cartItems[items][item] > 0) {
             totalAmount += itemInfo.price * cartItems[items][item];
           }
-        } catch (error) {}
+        } catch (error) {
+          console.log(error)
+        }
       }
     }
     return totalAmount;
@@ -82,6 +110,8 @@ const ShopContextProvider = (props) => {
     updateQuantity,
     getCartAmount,
     navigate,
+    backendUrl,
+    setToken,token
   };
   return (
     <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>
