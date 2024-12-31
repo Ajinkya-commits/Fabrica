@@ -48,7 +48,6 @@ export const addProduct = async (req, res) => {
       success: true,
       message: "Product added successfully",
       productData
-    
     });
   } catch (error) {
     console.error(error);
