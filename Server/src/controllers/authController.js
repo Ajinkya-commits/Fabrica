@@ -50,15 +50,12 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// Login user
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // First, verify the user through Firebase Authentication
-    const firebaseUser = await admin.auth().getUserByEmail(email);
-
-    // Find the user in MongoDB to get additional user details (name, hashed password, etc.)
+    // Check if the user exists in the database
     const user = await userModel.findOne({ email });
 
     if (!user) {
@@ -71,28 +68,24 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Generate a custom Firebase token for the user
-    const firebaseToken = await admin.auth().createCustomToken(firebaseUser.uid);
-
-    // Generate a JWT token for the user (this is used in your app for authentication purposes)
+    // Generate a JWT token using the user's ID
     const token = jwt.sign(
-      { userId: user._id},
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { id: user._id }, // Ensure the ID is included in the payload
+      process.env.JWT_SECRET
     );
 
-    // Send back the token and user info in the response
+    // Send the token and user information in the response
     res.status(200).json({
       message: "Login successful",
-      token,
-      firebaseToken, // Optional: You can send the Firebase token to the client for Firebase-specific operations
-      user: { name: user.name, email: user.email},
+      token, // Token used for authentication in the frontend
+      user: { id: user._id, name: user.name, email: user.email }, // Send back user details
     });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ message: "Something went wrong", error });
   }
 };
+
 // Admin login
 export const adminLogin = async (req, res) => {
   const { email, password } = req.body;

@@ -33,6 +33,7 @@ const Login = () => {
           password,
         });
         if (response.data) {
+          console.log(response.data)
           setToken(response.data.token);
           console.log(response.data.token);
           localStorage.setItem("token", response.data.token);
@@ -41,6 +42,7 @@ const Login = () => {
         }
       }
     } catch (error) {
+      console.log(error)
       toast.error("Invalid credentials");
     }
   };

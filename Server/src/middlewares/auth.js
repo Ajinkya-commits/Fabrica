@@ -4,15 +4,17 @@ const authUser = async (req, res, next) => {
   const { token } = req.headers;
 
   if (!token) {
-    return res.json({ success: false, message: "not authorized " });
+    return res.status(401).json({ success: false, message: "Not authorized" });
   }
+
   try {
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.userId = token_decode.id;
+
+    req.body.userId = token_decode.id; // Extract the `id` from payload
+    console.log("Decoded User ID:", req.body.userId);
     next();
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(401).json({ success: false, message: error.message });
   }
 };
 
