@@ -17,7 +17,7 @@ const PlaceOrder = () => {
     getCartAmount,
     delivery_fee,
     products,
-   } = useContext(ShopContext);
+  } = useContext(ShopContext);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -41,60 +41,76 @@ const PlaceOrder = () => {
     event.preventDefault();
     try {
       let orderItems = [];
-      for (const items in cartItems) {
-        for (const item in cartItems[items]) {
-          if (cartItems[items][items] > 0) {
+      // Loop through cartItems where each cartItem contains different sizes and their quantities
+      for (const productId in cartItems) {
+        const product = cartItems[productId];
+
+        // Loop through different sizes for each product
+        for (const size in product) {
+          const quantity = product[size];
+          if (quantity > 0) {
+            // Find the product info from the products list based on _id
             const itemInfo = structuredClone(
-              products.find((product) => product._id === items)
-            );                                    
+              products.find((product) => product._id === productId)
+            );
+
+            // If itemInfo is found, add size and quantity to the order
             if (itemInfo) {
-              itemInfo.size = item;
-              itemInfo.quantity = cartItems[item][item];
+              itemInfo.size = size;
+              itemInfo.quantity = quantity;
               orderItems.push(itemInfo);
             }
-
           }
         }
       }
 
-
-    let orderData = {
-      address:formData,
-      items: orderItems,
-      amount: getCartAmount() + delivery_fee
-    } 
-    switch (method) {
-      case 'cod': 
-       { const response = await axios.post(backendUrl + '/api/order/place',orderData, {headers: {token}}) 
-        if(response.data.success){
-          setCartItems([])
-          navigate('/orders')
+      let orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee,
+      };
+      switch (method) {
+        case "cod": {
+          const response = await axios.post(
+            backendUrl + "/api/order/place",
+            orderData,
+            { headers: { token } }
+          );
+          if (response.data.success) {
+            setCartItems([]);
+            navigate("/orders");
+          } else {
+            toast.error(response.data.message);
+          }
+          break;
         }
-        else{
-          toast.error(response.data.message)
+        case "stripe": {
+          const responseStripe = await axios.post(
+            backendUrl + "/api/order/stripe",
+            orderData,
+            { headers: { token } }
+          );
+          console.log(responseStripe.data);
+          if (responseStripe.data.success) {
+            const { session_url } = responseStripe.data;
+            window.location.replace(session_url);
+          } else {
+            toast.error(responseStripe.error.message);
+          }
+          break;
         }
-        break;}
-      case 'stripe':
-       { const repsonseStripe = await axios.post(backendUrl+'/api/order/stripe',orderData, {headers: {token}})
-        if(repsonseStripe.data.success){
-          const {session_url} = repsonseStripe.data;
-          window.location.replace(session_url)
-        }
-        else{
-          toast.error(repsonseStripe.error.message)
-        }
-        break;}
-      default:
-        break;
-     }
-    
-
+        default:
+          break;
+      }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
   return (
-    <form onSubmit={onSubmitHandler} className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t">
+    <form
+      onSubmit={onSubmitHandler}
+      className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
+    >
       {/* Left Side */}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">

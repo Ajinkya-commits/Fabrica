@@ -2,48 +2,49 @@ import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import axios from "axios";
+
 const Orders = () => {
-  const {backendUrl ,token, currency } = useContext(ShopContext);
+  const { backendUrl, token, currency } = useContext(ShopContext);
 
-  const [orderData, setorderData] = useState([])
+  const [orderData, setorderData] = useState([]);
 
-  const loadOrderData = async()=>{
-try {
-  if(!token)
-{
-  return null
-}
-const response = await axios.post(backendUrl + "/api/order/userorders", {}, {headers: {token}})
-if(response.data.success)
-{
-  let allOrdersItem = []
-  response.data.orders.map((order)=>{
-  order.items.map((item)=>{
-    item['status'] = order.status
-    item['payment'] = order.payment
-    item['paymentMethod'] = order.paymentMethod
-    item['date'] = order.date
-    allOrdersItem.push(item)
-  })
-  })
-  setorderData(allOrdersItem.reverse)
-}
+  const loadOrderData = async () => {
+    try {
+      if (!token) {
+        return null;
+      }
+      const response = await axios.post(backendUrl + "/api/order/userorders", {}, { headers: { token } });
+      if (response.data.success) {
+        let allOrdersItem = [];
+        response.data.orders.map((order) => {
+          order.items.map((item) => {
+            item["status"] = order.status;
+            item["payment"] = order.payment;
+            item["paymentMethod"] = order.paymentMethod;
+            item["date"] = order.date;
+            allOrdersItem.push(item);
+          });
+        });
+        // Reverse the array correctly
+        setorderData(allOrdersItem.reverse());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-} catch (error) {
-  console.log(error)
+  useEffect(() => {
+    loadOrderData();
+  }, [token]);
 
-}
-  }
-  useEffect(()=>{
-loadOrderData()
-  }, [token])
   return (
     <div className="border-t pt-16 text-white">
       <div className="text-2xl">
         <Title text1={"My"} text2={"ORDERS"}></Title>
       </div>
       <div>
-        {orderData.map(1, 4).map((item, index) => (
+        {/* Use slice to limit the number of items to 4 */}
+        {orderData.slice(0, 4).map((item, index) => (
           <div
             key={index}
             className="py-4 border-t border-b text-slate-50 flex flex-col md:flex-row md:items-center md:justify-between gap-4"

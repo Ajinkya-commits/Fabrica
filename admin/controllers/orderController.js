@@ -8,7 +8,7 @@ const allOrder = async(req,res)=>{
     res.json({success : true,orders})
   } catch (error) {
     console.log(error)
-    res.json({success : false , message : error.message})
+    res.json({ json:"ordseadmin" ,success : false , message : error.message})
   }
 }
 
