@@ -74,14 +74,14 @@ const ShopContextProvider = (props) => {
         setProducts(response.data.products);
       }
     } catch (error) {
-      console.error("error occurred while fetching product", error);
+      console.log("error occurred while fetching product", error);
       toast.error(error.message);
     }
   };
 
   const getUserCart = async (token) => {
     try {
-      await axios.post(
+     const response = await axios.post(
         backendUrl + "/api/cart/get",
         {},
         { headers: { token } }
@@ -151,6 +151,7 @@ const ShopContextProvider = (props) => {
     setShowSearch,
     cartItems,
     addToCart,
+    setCartItems,
     getCartCount,
     updateQuantity,
     getCartAmount,
