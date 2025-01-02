@@ -95,7 +95,7 @@ const Orders = ({ token }) => {
                 Items : {order.items ? order.items.length : 0}
               </p>
               <p className="mt-3">Method : {order.paymentMethod}</p>
-              <p>Payment : {order.payment}</p>
+              <p>Payment : {order.amount}</p>
               <p>Date : {new Date(order.date).toLocaleDateString()}</p>
             </div>
             <p className="text-sm sm:text-[15px]">

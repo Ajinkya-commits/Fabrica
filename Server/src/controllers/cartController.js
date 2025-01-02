@@ -1,5 +1,4 @@
 import userModel from "../models/userModel.js";
-import cartRouter from "../routes/cartRoute.js";
 
 const addToCart = async (req, res) => {
   try {
@@ -44,7 +43,7 @@ const getUserCart = async (req, res) => {
     const { userId } = req.body;
     const userData = await userModel.findById(userId);
     const cartData = await userData.cartData;
-
+    console.log(userId);
     res.json({ success: true, cartData });
   } catch (error) {
     res.json({ success: false, message: error.message });

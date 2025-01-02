@@ -1,41 +1,43 @@
-
-import axios from 'axios'
-import backendUrl from "../App" 
-import { useContext, useState ,useEffect } from 'react'
-import { toast } from 'react-toastify'
-import { ShopContext } from '../context/ShopContext'
+import axios from "axios";
+import backendUrl from "../App";
+import { useContext, useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import { ShopContext } from "../context/ShopContext";
+import { useSearchParams } from "react-router-dom";
 
 const Verify = () => {
-  const {navigate, token,setCartItems} = useContext(ShopContext)
-  const [searchParams, setSearchParams] = useState()
-  const success = searchParams.get('success')
-  const orderId = searchParams.get('orderId')
+  const { navigate, token, setCartItems } = useContext(ShopContext);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const success = searchParams.get("success");
+  const orderId = searchParams.get("orderId");
 
   const verifyPayment = async () => {
     try {
-      if(!token){
+      if (!token) {
         return null;
       }
-      const response = await axios.post(backendUrl + '/api/order/verifyStripe',{success,orderId},{headers:{token}})
-      if(response.data.success){
-        setCartItems({})
-        navigate('/orders')
-      }else{
-        navigate('/cart')
+      const response = await axios.post(
+        backendUrl + "/api/order/verifyStripe",
+        { success, orderId },
+        { headers: { token } }
+      );
+      console.log(response);
+      if (response.data.success) {
+        setCartItems({});
+        navigate("/orders");
+      } else {
+        navigate("/cart");
       }
     } catch (error) {
-      console.log(error)
-      toast.error(error.message)
+      navigate("/orders");
     }
-  }
+  };
 
   useEffect(() => {
-    verifyPayment()
-  }, [token])
-  
-  return (
-    <div>Verify</div>
-  )
-}
+    verifyPayment();
+  }, [token]);
 
-export default Verify
+  return <div>Verify</div>;
+};
+
+export default Verify;

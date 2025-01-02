@@ -46,7 +46,6 @@ const placeOrderStripe = async (req, res) => {
       payment: false,
       date: Date.now(),
     };
-
     const newOrder = new orderModel(orderData);
     await newOrder.save();
 
@@ -71,14 +70,14 @@ const placeOrderStripe = async (req, res) => {
       },
       quantity: 1,
     });
-    const session_url = await stripe.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
       line_items,
       mode: "payment",
     });
 
-    res.json({ success: true, session_url: session_url });
+    res.json({ success: true, session_url: session.url });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -94,10 +93,13 @@ const verifyStripe = async (req, res) => {
       await userModel.findByIdAndUpdate(userId, { cartData: {} });
       res.json({ success: true });
     } else {
-      await orderModel.findByIdAndUpdate(orderId);
-      res.json({ success: false, message: error.message });
+      await orderModel.findByIdAndDelete(orderId);
+      res.json({ success: false });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
 };
 //Placing orders using Razorpay method
 const placeOrderRazorpay = async (req, res) => {};
